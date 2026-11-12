@@ -1,6 +1,6 @@
 # SkillMate API
 
-Base URL: `http://localhost:8080`. All endpoints except register/login/logout require the HttpOnly `sm_token` cookie.
+Base URL: `http://localhost:8080` (development) / your Render URL (production). Frontend: `https://frontend-omega-six-43.vercel.app`. All endpoints except register/login/logout require the HttpOnly `sm_token` cookie.
 Every POST/PUT/DELETE must send the header `X-Requested-With: XMLHttpRequest` (CSRF defence). Send requests with credentials.
 
 Errors: `{ timestamp, status, error, message, fieldErrors? }`. Codes: 400 validation, 401 not logged in / expired, 403 forbidden, 404 not found (also used for other users' records), 409 conflict.

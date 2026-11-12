@@ -22,10 +22,10 @@ import java.time.Duration;
 @RequestMapping("/api/auth")
 public class AuthController {
     private final AuthService auth; private final JwtService jwt; private final UserRepository users;
-    private final boolean secureCookie;
+    private final boolean secureCookie; private final String sameSite;
 
-    public AuthController(AuthService auth, JwtService jwt, UserRepository users, @Value("${skillmate.cookie.secure:false}") boolean secureCookie) {
-        this.auth = auth; this.jwt = jwt; this.users = users; this.secureCookie = secureCookie;
+    public AuthController(AuthService auth, JwtService jwt, UserRepository users, @Value("${skillmate.cookie.secure:false}") boolean secureCookie, @Value("${skillmate.cookie.same-site:Lax}") String sameSite) {
+        this.auth = auth; this.jwt = jwt; this.users = users; this.secureCookie = secureCookie; this.sameSite = sameSite;
     }
 
     @PostMapping("/register")
@@ -50,9 +50,9 @@ public class AuthController {
         return users.findById(me.getId()).map(UserDto::from).orElseThrow(() -> ApiException.unauthorized("Session expired"));
     }
 
-    /** HttpOnly so JavaScript (and therefore XSS) cannot read the token; SameSite=Lax limits cross-site sends. */
+    /** HttpOnly so JavaScript (and therefore XSS) cannot read the token; SameSite is configurable (None for cross-site deploys). */
     private ResponseCookie cookie(String value, Duration maxAge) {
         return ResponseCookie.from(JwtAuthFilter.COOKIE_NAME, value).httpOnly(true).secure(secureCookie)
-                .sameSite("Lax").path("/").maxAge(maxAge).build();
+                .sameSite(sameSite).path("/").maxAge(maxAge).build();
     }
 }
